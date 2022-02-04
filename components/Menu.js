@@ -12,7 +12,7 @@ import AddIcon from "@mui/icons-material/Add";
 import LeaderboardIcon from "@mui/icons-material/Leaderboard";
 import { AppContext } from "context/appContext";
 import Link from "next/link";
-
+import { useRouter } from "next/router";
 export default function TemporaryDrawer() {
     const [state, setState] = useState({
         top: false,
@@ -25,6 +25,8 @@ export default function TemporaryDrawer() {
         AppContext
     );
     const { scores } = currentGame;
+
+    const router = useRouter();
 
     const toggleDrawer = (anchor, open) => (event) => {
         if (
@@ -50,6 +52,7 @@ export default function TemporaryDrawer() {
                     <ListItem
                         button
                         onClick={() => {
+                            router.push("/", undefined, { shallow: true });
                             setShowNew(true);
                         }}>
                         <PersonAddIcon sx={{ mr: 2 }} />
@@ -59,6 +62,7 @@ export default function TemporaryDrawer() {
                 <ListItem
                     button
                     onClick={() => {
+                        router.push("/", undefined, { shallow: true });
                         confirmNewGame();
                     }}>
                     <AddIcon sx={{ mr: 2 }} />

@@ -6,7 +6,6 @@ import {
     Dialog,
     DialogActions,
     DialogContent,
-    DialogContentText,
     DialogTitle,
     Table,
     TableBody,
@@ -47,7 +46,10 @@ export default function FormDialog() {
     };
 
     const template = (
-        <Box py={2}>
+        <Alert
+            icon={false}
+            severity="info"
+            sx={{ justifyContent: "center", mb: 2 }}>
             <Button
                 sx={{ mb: 2 }}
                 variant="contained"
@@ -78,7 +80,7 @@ export default function FormDialog() {
                     </TableBody>
                 </Table>
             </TableContainer>
-        </Box>
+        </Alert>
     );
 
     const addPlayer = () => {
@@ -166,11 +168,8 @@ export default function FormDialog() {
         <Dialog open={showNew} onClose={handleClose}>
             <DialogTitle>{title}</DialogTitle>
             <DialogContent>
-                <DialogContentText>
-                    {Object.keys(scores).length === 0 && template}
-                    Skriv spelarens namn och klicka på{" "}
-                    <strong>Lägg till</strong>
-                </DialogContentText>
+                {Object.keys(scores).length === 0 && template}
+                Skriv spelarens namn och klicka på <strong>Lägg till</strong>
                 {participants}
                 <TextField
                     error={hasErrors.error}
