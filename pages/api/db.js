@@ -25,8 +25,7 @@ export default async (req, res) => {
                 },
             })
         );
-
-        return res.status(200).json({ data: data });
+        return res.status(200).json(data);
     }
 
     return res.status(503).json("not available");
