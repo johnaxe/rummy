@@ -1,4 +1,5 @@
 import {
+    Alert,
     Table,
     TableBody,
     TableCell,
@@ -8,6 +9,7 @@ import {
     Paper,
     Badge,
     Typography,
+    TextField,
 } from "@mui/material";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import { rows } from "lib/config";
@@ -21,7 +23,7 @@ const getInitials = (name) => {
     return initials.toUpperCase();
 };
 
-const ScoreSummary = ({ scores }) => {
+const ScoreSummary = ({ ongoing, scores, round, setPlayerScore }) => {
     const players = [],
         sums = [];
 
@@ -36,7 +38,7 @@ const ScoreSummary = ({ scores }) => {
             <TableCell
                 title={k}
                 key={`player_${k}`}
-                sx={{ textAlign: "right" }}>
+                sx={{ textAlign: "center" }}>
                 {initials}
             </TableCell>
         );
@@ -51,43 +53,80 @@ const ScoreSummary = ({ scores }) => {
         });
 
     const winner = sorted.shift();
-    const loser = sorted.pop();
 
-    const dataRows = rows.map((row) => (
-        <TableRow
-            key={row.short_name}
-            sx={{
-                "&:last-child td, &:last-child th": {
-                    border: 0,
-                },
-            }}>
-            <TableCell>{row.short_name}</TableCell>
-
-            {players.map((col) => {
-                const score = scores[col.name].score[row.id];
-                return (
-                    <TableCell
-                        align="right"
-                        key={`${row.short_name}_${col.name}`}>
-                        {score == 0 ? (
-                            <Badge
-                                sx={{ top: 0, right: 5 }}
-                                showZero={true}
-                                badgeContent={0}
-                                color="success"
-                            />
-                        ) : (
-                            score
-                        )}
+    const dataRows = rows.map((row) => {
+        return (
+            row.id <= round && (
+                <TableRow
+                    key={row.short_name}
+                    sx={{
+                        "&:last-child td, &:last-child th": {
+                            border: 0,
+                        },
+                    }}>
+                    <TableCell>
+                        <Alert
+                            sx={{
+                                padding: 0,
+                                justifyContent: "center",
+                            }}
+                            icon={false}
+                            severity="info">
+                            {row.short_name}
+                        </Alert>
                     </TableCell>
-                );
-            })}
-        </TableRow>
-    ));
+
+                    {players.map((col) => {
+                        const score = scores[col.name].score[row.id];
+                        return (
+                            <TableCell
+                                align="center"
+                                key={`${row.short_name}_${col.name}`}>
+                                {score == 0 && row.id < round ? (
+                                    <Badge
+                                        sx={{ top: 0, right: 5 }}
+                                        showZero={true}
+                                        badgeContent={0}
+                                        color="success"
+                                    />
+                                ) : row.id == round ? (
+                                    <TextField
+                                        sx={{
+                                            maxWidth: 80,
+                                        }}
+                                        hiddenLabel
+                                        type="number"
+                                        inputProps={{
+                                            step: "5",
+                                            style: {
+                                                textAlign: "center",
+                                            },
+                                        }}
+                                        value={scores[col.name].score[row.id]}
+                                        variant="filled"
+                                        size="small"
+                                        onChange={(e) => {
+                                            setPlayerScore(
+                                                col.name,
+                                                row.id,
+                                                e.target.value
+                                            );
+                                        }}
+                                    />
+                                ) : (
+                                    <>{score}</>
+                                )}
+                            </TableCell>
+                        );
+                    })}
+                </TableRow>
+            )
+        );
+    });
 
     const summary = players.map((col) => (
         <TableCell
-            align="right"
+            align="center"
             key={`sa_${col.name}`}
             component="th"
             scope="row">
@@ -97,14 +136,16 @@ const ScoreSummary = ({ scores }) => {
 
     return (
         <>
-            <Typography
-                variant="h6"
-                sx={{
-                    alignItems: "center",
-                    display: "flex",
-                }}>
-                <EmojiEventsIcon sx={{ color: "gold" }} /> {winner.name}
-            </Typography>
+            {!ongoing && (
+                <Typography
+                    variant="h6"
+                    sx={{
+                        alignItems: "center",
+                        display: "flex",
+                    }}>
+                    <EmojiEventsIcon sx={{ color: "gold" }} /> {winner.name}
+                </Typography>
+            )}
 
             <TableContainer component={Paper}>
                 <Table size="small" aria-label="a dense table">
@@ -122,16 +163,18 @@ const ScoreSummary = ({ scores }) => {
                     </TableHead>
                     <TableBody>
                         {dataRows}
-                        <TableRow
-                            sx={{
-                                "&:last-child td, &:last-child th": {
-                                    border: 0,
-                                    fontWeight: 700,
-                                },
-                            }}>
-                            <TableCell>S:A</TableCell>
-                            {summary}
-                        </TableRow>
+                        {round == 7 && (
+                            <TableRow
+                                sx={{
+                                    "&:last-child td, &:last-child th": {
+                                        border: 0,
+                                        fontWeight: 700,
+                                    },
+                                }}>
+                                <TableCell>S:A</TableCell>
+                                {summary}
+                            </TableRow>
+                        )}
                     </TableBody>
                 </Table>
             </TableContainer>

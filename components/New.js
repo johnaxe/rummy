@@ -14,34 +14,45 @@ import {
     TableContainer,
     TableRow,
     Paper,
+    InputAdornment,
 } from "@mui/material";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import AccountCircle from "@mui/icons-material/AccountCircle";
 import { AppContext } from "context/appContext";
 
 export default function FormDialog() {
     const [name, setName] = useState("");
+    const [hasErrors, setHasErrors] = useState(false);
 
-    const { showNew, setShowNew, scores, setScores, initGame } = useContext(
-        AppContext
-    );
+    const {
+        showNew,
+        setShowNew,
+        currentGame,
+        setCurrentGame,
+        initGame,
+    } = useContext(AppContext);
+
+    const { scores } = currentGame;
 
     const handleName = (e) => {
         setName(e.target.value);
     };
 
     const handleClose = () => {
-        initGame();
+        //initGame();
         setShowNew(false);
     };
 
     const addPlayer = () => {
-        setScores({ ...scores, [name]: { score: Array(7).fill(0) } });
+        let newScores = { ...currentGame.scores };
+        newScores[name] = { score: Array(7).fill(0) };
+        setCurrentGame({ ...currentGame, scores: newScores });
         setName("");
     };
 
     const removePlayer = (name) => {
         const { [name]: tmp, ...rest } = scores;
-        setScores(rest);
+        setCurrentGame({ ...currentGame, scores: rest });
     };
 
     const rows = [];
@@ -94,6 +105,7 @@ export default function FormDialog() {
         scores && Object.keys(scores).length > 0
             ? "Lägg till / Ta bort spelare"
             : "Nytt spel";
+
     return (
         <Dialog open={showNew} onClose={handleClose}>
             <DialogTitle>{title}</DialogTitle>
@@ -104,7 +116,9 @@ export default function FormDialog() {
                 </DialogContentText>
                 {participants}
                 <TextField
+                    error={hasErrors}
                     autoFocus
+                    required
                     margin="dense"
                     id="name"
                     label="Spelarnamn"
@@ -113,11 +127,21 @@ export default function FormDialog() {
                     value={name}
                     variant="standard"
                     onChange={handleName}
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                <AccountCircle />
+                            </InputAdornment>
+                        ),
+                    }}
                 />
             </DialogContent>
             <DialogActions>
-                <Button onClick={handleClose}>Spela</Button>
+                <Button variant="contained" onClick={handleClose}>
+                    Stäng
+                </Button>
                 <Button
+                    variant="contained"
                     onClick={() => {
                         addPlayer();
                     }}>

@@ -20,8 +20,8 @@ export default function TemporaryDrawer() {
         right: false,
     });
 
-    const { setShowNew, resetGame, scores } = useContext(AppContext);
-
+    const { setShowNew, initGame, currentGame } = useContext(AppContext);
+    const { scores } = currentGame;
     const toggleDrawer = (anchor, open) => (event) => {
         if (
             event.type === "keydown" &&
@@ -55,7 +55,7 @@ export default function TemporaryDrawer() {
                 <ListItem
                     button
                     onClick={() => {
-                        resetGame();
+                        initGame();
                         setShowNew(true);
                     }}>
                     <AddIcon sx={{ mr: 2 }} />

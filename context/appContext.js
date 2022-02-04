@@ -4,90 +4,79 @@ import axios from "axios";
 const AppContext = createContext();
 
 const AppProvider = ({ children }) => {
-    const [scores, setScores] = useState({});
-    const [round, setRound] = useState(0);
+    const [currentGame, setCurrentGame] = useState({
+        id: null,
+        round: 0,
+        date: null,
+        scores: {},
+    });
+
     const [showNew, setShowNew] = useState(false);
     const [showSaved, setShowSaved] = useState(false);
-
-    const resetGame = async () => {
-        await axios.post("/api/db", {
-            action: "save",
-            scores: scores,
-        });
-
-        setRound(0);
-        setScores({});
-        setCookie(null, "round", 0, {
-            maxAge: -1,
-            sameSite: "none",
-            secure: true,
-            path: "/",
-        });
-        setCookie(null, "currentGame", JSON.stringify({}), {
-            maxAge: -1,
-            sameSite: "none",
-            secure: true,
-            path: "/",
-        });
-        setShowSaved(true);
-    };
-
-    const initGame = () => {
-        setCookie(null, "round", 0, {
-            maxAge: 30 * 24 * 60 * 60,
-            sameSite: "none",
-            secure: true,
-            path: "/",
-        });
-        setCookie(null, "currentGame", JSON.stringify(scores), {
-            maxAge: 30 * 24 * 60 * 60,
-            sameSite: "none",
-            secure: true,
-            path: "/",
-        });
-    };
-
-    const handleRound = (val) => {
-        const nextRound = round + val;
-        setRound(nextRound);
-        setCookie(null, "round", nextRound, {
-            maxAge: 30 * 24 * 60 * 60,
-            sameSite: "none",
-            secure: true,
-            path: "/",
-        });
-    };
-
-    const setPlayerScore = (player, rowId, x) => {
-        let newScores = { ...scores };
-        newScores[player].score[rowId] = x;
-        setScores(newScores);
-        setCookie(null, "currentGame", JSON.stringify(newScores), {
-            maxAge: 30 * 24 * 60 * 60,
-            sameSite: "none",
-            secure: true,
-            path: "/",
-        });
-    };
 
     useEffect(() => {
         const cookies = parseCookies();
         if (cookies.hasOwnProperty("currentGame")) {
-            setScores(JSON.parse(cookies.currentGame));
-        }
-        if (cookies.hasOwnProperty("round")) {
-            setRound(parseInt(cookies.round));
+            setCurrentGame(JSON.parse(cookies.currentGame));
         }
     }, []);
+
+    useEffect(() => {
+        updateCookie();
+    }, [currentGame]);
+
+    const saveGame = async (showMsg = true) => {
+        const { data } = await axios.post("/api/db", {
+            action: currentGame.id ? "update" : "save",
+            currentGame: currentGame,
+        });
+
+        setCurrentGame({ ...currentGame, id: data.id });
+        setShowSaved(showMsg);
+    };
+
+    const initGame = () => {
+        const d = new Date();
+        setCurrentGame({
+            id: null,
+            round: 0,
+            date: `${d.toLocaleDateString("sv-SE")} ${d.toLocaleTimeString(
+                "sv-SE"
+            )}`,
+            scores: {},
+        });
+    };
+
+    const updateCookie = () => {
+        setCookie(null, "currentGame", JSON.stringify(currentGame), {
+            maxAge: 30 * 24 * 60 * 60,
+            sameSite: "none",
+            secure: true,
+            path: "/",
+        });
+    };
+
+    const setRound = (val) => {
+        const { round } = currentGame;
+        setCurrentGame({ ...currentGame, round: round + val });
+        //saveGame(false);
+    };
+
+    const setPlayerScore = (player, rowId, x) => {
+        let newScores = { ...currentGame.scores };
+        newScores[player].score[rowId] = x;
+        setCurrentGame({ ...currentGame, scores: newScores });
+        saveGame(false);
+    };
+
     const value = {
-        scores,
-        setScores,
+        currentGame,
+        setCurrentGame,
         setPlayerScore,
+        setRound,
         showNew,
         setShowNew,
-        round,
-        handleRound,
-        resetGame,
+        saveGame,
         initGame,
         showSaved,
         setShowSaved,
