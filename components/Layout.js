@@ -6,6 +6,7 @@ import Typography from "@mui/material/Typography";
 
 import Menu from "@/components/Menu";
 import New from "@/components/New";
+import ConfirmNewGame from "@/components/ConfirmNewGame";
 export default function Layout({ children }) {
     return (
         <>
@@ -33,6 +34,7 @@ export default function Layout({ children }) {
 
             {children}
             <New />
+            <ConfirmNewGame />
             <footer></footer>
         </>
     );

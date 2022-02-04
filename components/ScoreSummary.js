@@ -66,6 +66,7 @@ const ScoreSummary = ({ ongoing, scores, round, setPlayerScore }) => {
                     }}>
                     <TableCell>
                         <Alert
+                            title={`Omgång ${row.id + 1}: ${row.name}`}
                             sx={{
                                 padding: 0,
                                 justifyContent: "center",
@@ -135,35 +136,22 @@ const ScoreSummary = ({ ongoing, scores, round, setPlayerScore }) => {
     ));
 
     return (
-        <>
-            {!ongoing && (
-                <Typography
-                    variant="h6"
-                    sx={{
-                        alignItems: "center",
-                        display: "flex",
-                    }}>
-                    <EmojiEventsIcon sx={{ color: "gold" }} /> {winner.name}
-                </Typography>
-            )}
+        playerNames.length > 0 && (
+            <>
+                {round == 7 && (
+                    <Typography
+                        variant="h6"
+                        sx={{
+                            alignItems: "center",
+                            display: "flex",
+                        }}>
+                        <EmojiEventsIcon sx={{ color: "gold" }} /> {winner.name}
+                    </Typography>
+                )}
 
-            <TableContainer component={Paper}>
-                <Table size="small" aria-label="a dense table">
-                    <TableHead>
-                        <TableRow
-                            sx={{
-                                "&:last-child td, &:last-child th": {
-                                    border: 0,
-                                    fontWeight: 700,
-                                },
-                            }}>
-                            <TableCell>Omgång</TableCell>
-                            {playerNames}
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {dataRows}
-                        {round == 7 && (
+                <TableContainer component={Paper}>
+                    <Table size="small" aria-label="a dense table">
+                        <TableHead>
                             <TableRow
                                 sx={{
                                     "&:last-child td, &:last-child th": {
@@ -171,14 +159,29 @@ const ScoreSummary = ({ ongoing, scores, round, setPlayerScore }) => {
                                         fontWeight: 700,
                                     },
                                 }}>
-                                <TableCell>S:A</TableCell>
-                                {summary}
+                                <TableCell>Omgång</TableCell>
+                                {playerNames}
                             </TableRow>
-                        )}
-                    </TableBody>
-                </Table>
-            </TableContainer>
-        </>
+                        </TableHead>
+                        <TableBody>
+                            {dataRows}
+                            {round == 7 && (
+                                <TableRow
+                                    sx={{
+                                        "&:last-child td, &:last-child th": {
+                                            border: 0,
+                                            fontWeight: 700,
+                                        },
+                                    }}>
+                                    <TableCell>S:A</TableCell>
+                                    {summary}
+                                </TableRow>
+                            )}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+            </>
+        )
     );
 };
 

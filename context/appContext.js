@@ -13,6 +13,7 @@ const AppProvider = ({ children }) => {
 
     const [showNew, setShowNew] = useState(false);
     const [showSaved, setShowSaved] = useState(false);
+    const [showConfirm, setShowConfirm] = useState(false);
 
     useEffect(() => {
         const cookies = parseCookies();
@@ -45,6 +46,7 @@ const AppProvider = ({ children }) => {
             )}`,
             scores: {},
         });
+        setShowNew(true);
     };
 
     const updateCookie = () => {
@@ -59,14 +61,30 @@ const AppProvider = ({ children }) => {
     const setRound = (val) => {
         const { round } = currentGame;
         setCurrentGame({ ...currentGame, round: round + val });
-        //saveGame(false);
     };
 
     const setPlayerScore = (player, rowId, x) => {
         let newScores = { ...currentGame.scores };
         newScores[player].score[rowId] = x;
         setCurrentGame({ ...currentGame, scores: newScores });
-        saveGame(false);
+    };
+
+    const confirmNewGame = () => {
+        if (currentGame.id) {
+            setShowConfirm(true);
+            return;
+        }
+        initGame();
+        setShowNew(true);
+    };
+
+    const useTemplate = (players) => {
+        let newScores = { ...currentGame.scores };
+        players.map((player) => {
+            newScores[player] = { score: Array(7).fill(0) };
+        });
+        setCurrentGame({ ...currentGame, scores: newScores });
+        setShowNew(false);
     };
 
     const value = {
@@ -80,6 +98,10 @@ const AppProvider = ({ children }) => {
         initGame,
         showSaved,
         setShowSaved,
+        confirmNewGame,
+        showConfirm,
+        setShowConfirm,
+        useTemplate,
     };
 
     return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

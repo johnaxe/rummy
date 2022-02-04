@@ -15,21 +15,24 @@ import {
     TableRow,
     Paper,
     InputAdornment,
+    Alert,
+    Typography,
 } from "@mui/material";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import { AppContext } from "context/appContext";
+import { playerTemplate } from "lib/config";
 
 export default function FormDialog() {
     const [name, setName] = useState("");
-    const [hasErrors, setHasErrors] = useState(false);
+    const [hasErrors, setHasErrors] = useState({ error: false, errorText: "" });
 
     const {
         showNew,
         setShowNew,
         currentGame,
         setCurrentGame,
-        initGame,
+        useTemplate,
     } = useContext(AppContext);
 
     const { scores } = currentGame;
@@ -43,7 +46,59 @@ export default function FormDialog() {
         setShowNew(false);
     };
 
+    const template = (
+        <Box py={2}>
+            <Button
+                sx={{ mb: 2 }}
+                variant="contained"
+                onClick={() => {
+                    useTemplate(playerTemplate);
+                }}>
+                Använd mall
+            </Button>
+            <TableContainer component={Paper}>
+                <Table
+                    sx={{ minWidth: 240 }}
+                    size="small"
+                    aria-label="template">
+                    <TableBody>
+                        {playerTemplate.map((player) => (
+                            <TableRow
+                                key={player}
+                                sx={{
+                                    "&:last-child td, &:last-child th": {
+                                        border: 0,
+                                    },
+                                }}>
+                                <TableCell component="td" scope="row">
+                                    {player}
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        </Box>
+    );
+
     const addPlayer = () => {
+        setHasErrors({ error: false, errorText: "" });
+        if (name == "") {
+            setHasErrors({ error: true, errorText: "Namn kan inte vara tomt" });
+            return;
+        }
+        const playerNames = Object.entries(scores).map(([k, v]) => {
+            return k;
+        });
+
+        if (playerNames.includes(name)) {
+            setHasErrors({
+                error: true,
+                errorText: "Det finns redan en spelare med samma namn.",
+            });
+            return;
+        }
+
         let newScores = { ...currentGame.scores };
         newScores[name] = { score: Array(7).fill(0) };
         setCurrentGame({ ...currentGame, scores: newScores });
@@ -51,6 +106,7 @@ export default function FormDialog() {
     };
 
     const removePlayer = (name) => {
+        setHasErrors({ error: false, errorText: "" });
         const { [name]: tmp, ...rest } = scores;
         setCurrentGame({ ...currentGame, scores: rest });
     };
@@ -104,19 +160,21 @@ export default function FormDialog() {
     const title =
         scores && Object.keys(scores).length > 0
             ? "Lägg till / Ta bort spelare"
-            : "Nytt spel";
+            : "Ny spelomgång";
 
     return (
         <Dialog open={showNew} onClose={handleClose}>
             <DialogTitle>{title}</DialogTitle>
             <DialogContent>
                 <DialogContentText>
+                    {Object.keys(scores).length === 0 && template}
                     Skriv spelarens namn och klicka på{" "}
                     <strong>Lägg till</strong>
                 </DialogContentText>
                 {participants}
                 <TextField
-                    error={hasErrors}
+                    error={hasErrors.error}
+                    helperText={hasErrors.errorText}
                     autoFocus
                     required
                     margin="dense"

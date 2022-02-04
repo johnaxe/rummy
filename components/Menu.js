@@ -4,8 +4,9 @@ import Drawer from "@mui/material/Drawer";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
-import SportsScoreIcon from "@mui/icons-material/SportsScore";
+import HistoryIcon from "@mui/icons-material/History";
 import IconButton from "@mui/material/IconButton";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import MenuIcon from "@mui/icons-material/Menu";
 import AddIcon from "@mui/icons-material/Add";
 import LeaderboardIcon from "@mui/icons-material/Leaderboard";
@@ -20,8 +21,11 @@ export default function TemporaryDrawer() {
         right: false,
     });
 
-    const { setShowNew, initGame, currentGame } = useContext(AppContext);
+    const { setShowNew, initGame, currentGame, confirmNewGame } = useContext(
+        AppContext
+    );
     const { scores } = currentGame;
+
     const toggleDrawer = (anchor, open) => (event) => {
         if (
             event.type === "keydown" &&
@@ -48,25 +52,22 @@ export default function TemporaryDrawer() {
                         onClick={() => {
                             setShowNew(true);
                         }}>
-                        <AddIcon sx={{ mr: 2 }} />
+                        <PersonAddIcon sx={{ mr: 2 }} />
                         <ListItemText primary="Lägg till / Ta bort spelare" />
                     </ListItem>
                 )}
                 <ListItem
                     button
                     onClick={() => {
-                        initGame();
-                        setShowNew(true);
+                        confirmNewGame();
                     }}>
                     <AddIcon sx={{ mr: 2 }} />
-                    <ListItemText primary="Nytt spel" />
+                    <ListItemText primary="Ny spelomgång" />
                 </ListItem>
                 <ListItem button>
-                    <SportsScoreIcon sx={{ mr: 2 }} />
+                    <HistoryIcon sx={{ mr: 2 }} />
                     <Link href="/history">
-                        <a>
-                            <ListItemText primary="Tidigare spel" />
-                        </a>
+                        <ListItemText primary="Historik" />
                     </Link>
                 </ListItem>
                 <ListItem button>

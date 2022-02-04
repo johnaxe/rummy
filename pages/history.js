@@ -1,12 +1,12 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { Button, Box, Grid, Container } from "@mui/material";
+import { Button, Box, Container } from "@mui/material";
 
 import Layout from "@/components/Layout";
 import ScoreSummary from "@/components/ScoreSummary";
 const History = () => {
     const [documents, setDocuments] = useState([]);
-    const [scores, setScores] = useState(null);
+    const [currentGame, setCurrentGame] = useState(null);
     useEffect(() => {
         const getAll = async () => {
             const { data } = await axios.post("/api/db", {
@@ -27,14 +27,22 @@ const History = () => {
                             <Button
                                 variant="contained"
                                 onClick={() => {
-                                    setScores(data.scores);
+                                    setCurrentGame(data);
                                 }}>
                                 {data.date}
                             </Button>
                         </Box>
                     );
                 })}
-            <Container>{scores && <ScoreSummary scores={scores} />}</Container>
+            <Container>
+                {currentGame && (
+                    <ScoreSummary
+                        scores={currentGame.scores}
+                        ongoing={false}
+                        round={currentGame.round}
+                    />
+                )}
+            </Container>
         </>
     );
 };
