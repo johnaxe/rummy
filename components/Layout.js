@@ -3,7 +3,7 @@ import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-
+import Link from "next/link";
 import Menu from "@/components/Menu";
 import New from "@/components/New";
 import ConfirmNewGame from "@/components/ConfirmNewGame";
@@ -22,12 +22,14 @@ export default function Layout({ children }) {
                 <AppBar position="static">
                     <Toolbar variant="dense">
                         <Menu />
-                        <Typography
-                            variant="h6"
-                            color="inherit"
-                            component="div">
-                            Rummy scoreboard
-                        </Typography>
+                        <Link href="/">
+                            <Typography
+                                variant="h6"
+                                color="inherit"
+                                component="div">
+                                Rummy scoreboard
+                            </Typography>
+                        </Link>
                     </Toolbar>
                 </AppBar>
             </Box>

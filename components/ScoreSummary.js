@@ -29,7 +29,7 @@ const ScoreSummary = ({ ongoing, scores, round, setPlayerScore }) => {
 
     const playerNames = Object.entries(scores).map(([k, v]) => {
         const initials = getInitials(k);
-        players.push({ name: k, score: v.score });
+        players.push({ name: k, initials: initials, score: v.score });
         sums[k] = v.score.reduce(function (a, b) {
             return parseInt(a) + parseInt(b);
         }, 0);
@@ -95,17 +95,23 @@ const ScoreSummary = ({ ongoing, scores, round, setPlayerScore }) => {
                                         sx={{
                                             maxWidth: 80,
                                         }}
-                                        hiddenLabel
-                                        type="number"
+                                        label={col.initials}
+                                        InputLabelProps={{
+                                            shrink: true,
+                                        }}
                                         inputProps={{
                                             step: "5",
+                                            type: "number",
+                                            min: 0,
+                                            pattern: "[0-9]*",
                                             style: {
                                                 textAlign: "center",
                                             },
                                         }}
-                                        value={scores[col.name].score[row.id]}
-                                        variant="filled"
-                                        size="small"
+                                        defaultValue=""
+                                        //value={scores[col.name].score[row.id]}
+                                        variant="outlined"
+                                        size="medium"
                                         onChange={(e) => {
                                             setPlayerScore(
                                                 col.name,
@@ -150,7 +156,7 @@ const ScoreSummary = ({ ongoing, scores, round, setPlayerScore }) => {
                 )}
 
                 <TableContainer component={Paper}>
-                    <Table size="small" aria-label="a dense table">
+                    <Table size="medium" aria-label="scoreboard">
                         <TableHead>
                             <TableRow
                                 sx={{
