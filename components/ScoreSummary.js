@@ -81,6 +81,7 @@ const ScoreSummary = ({ ongoing, scores, round, setPlayerScore }) => {
                         const score = scores[col.name].score[row.id];
                         return (
                             <TableCell
+                                sx={{ py: 2 }}
                                 align="center"
                                 key={`${row.short_name}_${col.name}`}>
                                 {score == 0 && row.id < round ? (
@@ -133,6 +134,7 @@ const ScoreSummary = ({ ongoing, scores, round, setPlayerScore }) => {
 
     const summary = players.map((col) => (
         <TableCell
+            sx={{ p: 2 }}
             align="center"
             key={`sa_${col.name}`}
             component="th"
@@ -156,7 +158,7 @@ const ScoreSummary = ({ ongoing, scores, round, setPlayerScore }) => {
                 )}
 
                 <TableContainer component={Paper}>
-                    <Table size="medium" aria-label="scoreboard">
+                    <Table size="small" aria-label="scoreboard">
                         <TableHead>
                             <TableRow
                                 sx={{

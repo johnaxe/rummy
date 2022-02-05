@@ -1,13 +1,14 @@
 import Head from "next/head";
-import AppBar from "@mui/material/AppBar";
-import Box from "@mui/material/Box";
-import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
+import { AppBar, Box, Toolbar, Tooltip, Typography } from "@mui/material";
 import Link from "next/link";
+import { useContext } from "react";
+import TableViewIcon from "@mui/icons-material/TableView";
 import Menu from "@/components/Menu";
 import New from "@/components/New";
 import ConfirmNewGame from "@/components/ConfirmNewGame";
+import { AppContext } from "context/appContext";
 export default function Layout({ children }) {
+    const { currentGame } = useContext(AppContext);
     return (
         <>
             <Head>
@@ -24,12 +25,26 @@ export default function Layout({ children }) {
                         <Menu />
                         <Link href="/">
                             <Typography
+                                title="Gå till spelomgång"
                                 variant="h6"
                                 color="inherit"
-                                component="div">
-                                Rummy scoreboard
+                                component="div"
+                                sx={{ cursor: "pointer" }}>
+                                RUMMY
                             </Typography>
                         </Link>
+                        {currentGame.id && (
+                            <Box
+                                display="flex"
+                                alignItems="center"
+                                sx={{ marginLeft: "auto", cursor: "pointer" }}>
+                                <Link href="/">
+                                    <Tooltip title="Aktiv spelomgång">
+                                        <TableViewIcon />
+                                    </Tooltip>
+                                </Link>
+                            </Box>
+                        )}
                     </Toolbar>
                 </AppBar>
             </Box>
