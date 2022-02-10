@@ -76,7 +76,9 @@ export default function TemporaryDrawer() {
                 </ListItem>
                 <ListItem button>
                     <LeaderboardIcon sx={{ mr: 2 }} />
-                    <ListItemText primary="Statistik" />
+                    <Link href="/stats">
+                        <ListItemText primary="Statistik" />
+                    </Link>
                 </ListItem>
             </List>
         </Box>

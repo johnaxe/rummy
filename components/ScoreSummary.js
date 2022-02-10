@@ -12,16 +12,7 @@ import {
     TextField,
 } from "@mui/material";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
-import { rows } from "lib/config";
-
-const getInitials = (name) => {
-    const fullName = name.split(" ");
-    const initials =
-        fullName.length == 2
-            ? fullName.shift().charAt(0) + fullName.pop().charAt(0)
-            : fullName[0].charAt(0);
-    return initials.toUpperCase();
-};
+import { rows, getInitials } from "lib/config";
 
 const ScoreSummary = ({ ongoing, scores, round, setPlayerScore }) => {
     const players = [],
