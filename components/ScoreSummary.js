@@ -151,7 +151,7 @@ const ScoreSummary = ({
             {sums[col.name]}
         </TableCell>
     ));
-    const gameDate = new Date(date.replace(/-/g, "/"));
+
     return (
         playerNames.length > 0 && (
             <>
@@ -175,10 +175,12 @@ const ScoreSummary = ({
                             <EmojiEventsIcon sx={{ color: "gold" }} />{" "}
                             {winner.name}
                         </Typography>
-                        {finished && (
+                        {finished && date && (
                             <Box sx={{ marginLeft: "auto" }}>
                                 <Chip
-                                    label={gameDate.toLocaleDateString("sv-SE")}
+                                    label={new Date(
+                                        date.replace(/-/g, "/")
+                                    ).toLocaleDateString("sv-SE")}
                                 />
                             </Box>
                         )}
