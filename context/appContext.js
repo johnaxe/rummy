@@ -36,6 +36,21 @@ const AppProvider = ({ children }) => {
         setShowSaved(showMsg);
     };
 
+    const finishGame = async (showMsg = true) => {
+        const thisGame = currentGame;
+        thisGame["finished"] = true;
+        const { data } = await axios.post("/api/db", {
+            action: currentGame.id ? "update" : "save",
+            currentGame: thisGame,
+        });
+
+        setCurrentGame({ ...currentGame, id: data.id });
+        setShowSaved(showMsg);
+        setTimeout(() => {
+            initGame();
+        }, 5000);
+    };
+
     const initGame = () => {
         const d = new Date();
         setCurrentGame({
@@ -95,6 +110,7 @@ const AppProvider = ({ children }) => {
         showNew,
         setShowNew,
         saveGame,
+        finishGame,
         initGame,
         showSaved,
         setShowSaved,

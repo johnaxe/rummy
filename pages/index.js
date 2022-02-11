@@ -18,9 +18,10 @@ import { useContext, useState, useEffect } from "react";
 import Layout from "@/components/Layout";
 import { AppContext } from "context/appContext";
 import ScoreSummary from "@/components/ScoreSummary";
+import Confetti from "react-confetti";
 
 const Home = () => {
-    const [scoreError, setScoreError] = useState(false);
+    const [scoreError, setScoreError] = useState({ error: false, type: 1 });
     const [mounted, setMounted] = useState(false);
     const [scoresExist, setScoresExist] = useState(false);
     const {
@@ -28,6 +29,7 @@ const Home = () => {
         setPlayerScore,
         setRound,
         saveGame,
+        finishGame,
         showSaved,
         setShowSaved,
         setShowNew,
@@ -55,8 +57,14 @@ const Home = () => {
             roundValues.push({ name: k, score: v.score[round] });
         });
         const zeros = roundValues.filter((item) => item.score == 0);
+
+        const empties = roundValues.filter((item) => item.score == "");
+        if (empties.length > 0) {
+            setScoreError({ error: true, type: 2 });
+            return;
+        }
         if (zeros.length != 1) {
-            setScoreError(true);
+            setScoreError({ error: true, type: 1 });
             return;
         }
         setRound(1);
@@ -66,7 +74,7 @@ const Home = () => {
         mounted &&
         scoresExist && (
             <Container sx={{ pt: 2 }}>
-                <Collapse in={scoreError}>
+                <Collapse in={scoreError.error}>
                     <Alert
                         severity="error"
                         action={
@@ -75,16 +83,26 @@ const Home = () => {
                                 color="inherit"
                                 size="small"
                                 onClick={() => {
-                                    setScoreError(false);
+                                    setScoreError({ error: false, type: 1 });
                                 }}>
                                 <CloseIcon fontSize="inherit" />
                             </IconButton>
                         }
                         sx={{ mb: 2 }}>
-                        Det måste alltid finnas <strong>en</strong> ensam
-                        vinnare i varje spelomgång (0 poäng). Vg korrigera
-                        poängräkningen i <strong>spelomgång {round + 1}</strong>
-                        .
+                        {scoreError.type == 1 ? (
+                            <div>
+                                Det måste alltid finnas <strong>en</strong>{" "}
+                                ensam vinnare i varje spelomgång (0 poäng). Vg
+                                korrigera poängräkningen i{" "}
+                                <strong>spelomgång {round + 1}</strong>.
+                            </div>
+                        ) : (
+                            <div>
+                                Inget fält får vara tomt. Vg komplettera
+                                poängräkningen i{" "}
+                                <strong>spelomgång {round + 1}</strong>
+                            </div>
+                        )}
                     </Alert>
                 </Collapse>
                 <ScoreSummary
@@ -92,6 +110,7 @@ const Home = () => {
                     ongoing={true}
                     round={round}
                     setPlayerScore={setPlayerScore}
+                    finished={false}
                 />
                 <Snackbar
                     open={showSaved}
@@ -124,7 +143,7 @@ const Home = () => {
                             <Button
                                 sx={{ width: 160 }}
                                 onClick={() => {
-                                    setScoreError(false);
+                                    setScoreError({ error: false, type: 1 });
                                     setRound(-1);
                                 }}
                                 variant="contained"
@@ -137,7 +156,7 @@ const Home = () => {
                             <Button
                                 sx={{ marginLeft: "auto", width: 160 }}
                                 onClick={() => {
-                                    setScoreError(false);
+                                    setScoreError({ error: false, type: 1 });
                                     checkValues();
                                 }}
                                 variant="contained"
@@ -149,16 +168,29 @@ const Home = () => {
                 )}
                 <Box mt={1}>
                     <Divider />
-                    <Button
-                        sx={{ mt: 1, width: { xs: "100%", md: 160 } }}
-                        onClick={() => {
-                            saveGame();
-                        }}
-                        variant="contained"
-                        endIcon={<SaveIcon />}>
-                        Spara
-                    </Button>
+                    {round < 7 ? (
+                        <Button
+                            sx={{ mt: 1, width: { xs: "100%", md: 160 } }}
+                            onClick={() => {
+                                saveGame();
+                            }}
+                            variant="contained"
+                            endIcon={<SaveIcon />}>
+                            Spara
+                        </Button>
+                    ) : (
+                        <Button
+                            sx={{ mt: 1, width: { xs: "100%", md: 160 } }}
+                            onClick={() => {
+                                finishGame();
+                            }}
+                            variant="contained"
+                            endIcon={<SaveIcon />}>
+                            Avsluta spelomgången
+                        </Button>
+                    )}
                 </Box>
+                {round == 7 && <Confetti recycle={false} />}
             </Container>
         )
     );

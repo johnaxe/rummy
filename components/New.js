@@ -102,7 +102,7 @@ export default function FormDialog() {
         }
 
         let newScores = { ...currentGame.scores };
-        newScores[name] = { score: Array(7).fill(0) };
+        newScores[name] = { score: Array(7).fill("") };
         setCurrentGame({ ...currentGame, scores: newScores });
         setName("");
     };

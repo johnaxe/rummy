@@ -8,13 +8,26 @@ import {
     TableRow,
     Paper,
     Badge,
+    Box,
+    Chip,
     Typography,
     TextField,
+    Collapse,
 } from "@mui/material";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import { rows, getInitials } from "lib/config";
 
-const ScoreSummary = ({ ongoing, scores, round, setPlayerScore }) => {
+const ScoreSummary = ({
+    ongoing,
+    scores,
+    round,
+    setPlayerScore,
+    date,
+    id,
+    visible,
+    setVisible,
+    finished,
+}) => {
     const players = [],
         sums = [];
 
@@ -100,7 +113,12 @@ const ScoreSummary = ({ ongoing, scores, round, setPlayerScore }) => {
                                                 textAlign: "center",
                                             },
                                         }}
-                                        defaultValue=""
+                                        //defaultValue={false}
+                                        value={
+                                            scores[col.name].score[row.id] != ""
+                                                ? scores[col.name].score[row.id]
+                                                : ""
+                                        }
                                         //value={scores[col.name].score[row.id]}
                                         variant="outlined"
                                         size="medium"
@@ -133,38 +151,43 @@ const ScoreSummary = ({ ongoing, scores, round, setPlayerScore }) => {
             {sums[col.name]}
         </TableCell>
     ));
-
+    const gameDate = new Date(date);
     return (
         playerNames.length > 0 && (
             <>
                 {round == 7 && (
-                    <Typography
-                        variant="h6"
+                    <Box
+                        pb={1}
+                        display="flex"
+                        flexDirection="row"
                         sx={{
-                            alignItems: "center",
-                            display: "flex",
+                            cursor: finished ? "pointer" : "default",
+                        }}
+                        onClick={() => {
+                            finished && setVisible(id == visible ? 1 : id);
                         }}>
-                        <EmojiEventsIcon sx={{ color: "gold" }} /> {winner.name}
-                    </Typography>
+                        <Typography
+                            variant="h6"
+                            sx={{
+                                alignItems: "center",
+                                display: "flex",
+                            }}>
+                            <EmojiEventsIcon sx={{ color: "gold" }} />{" "}
+                            {winner.name}
+                        </Typography>
+                        {finished && (
+                            <Box sx={{ marginLeft: "auto" }}>
+                                <Chip
+                                    label={gameDate.toLocaleDateString("sv-SE")}
+                                />
+                            </Box>
+                        )}
+                    </Box>
                 )}
-
-                <TableContainer component={Paper}>
-                    <Table size="small" aria-label="scoreboard">
-                        <TableHead>
-                            <TableRow
-                                sx={{
-                                    "&:last-child td, &:last-child th": {
-                                        border: 0,
-                                        fontWeight: 700,
-                                    },
-                                }}>
-                                <TableCell>Omgång</TableCell>
-                                {playerNames}
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {dataRows}
-                            {round == 7 && (
+                <Collapse in={id == visible}>
+                    <TableContainer component={Paper}>
+                        <Table size="small" aria-label="scoreboard">
+                            <TableHead>
                                 <TableRow
                                     sx={{
                                         "&:last-child td, &:last-child th": {
@@ -172,13 +195,28 @@ const ScoreSummary = ({ ongoing, scores, round, setPlayerScore }) => {
                                             fontWeight: 700,
                                         },
                                     }}>
-                                    <TableCell>S:A</TableCell>
-                                    {summary}
+                                    <TableCell>Omgång</TableCell>
+                                    {playerNames}
                                 </TableRow>
-                            )}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
+                            </TableHead>
+                            <TableBody>
+                                {dataRows}
+                                {round == 7 && (
+                                    <TableRow
+                                        sx={{
+                                            "&:last-child td, &:last-child th": {
+                                                border: 0,
+                                                fontWeight: 700,
+                                            },
+                                        }}>
+                                        <TableCell>S:A</TableCell>
+                                        {summary}
+                                    </TableRow>
+                                )}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                </Collapse>
             </>
         )
     );

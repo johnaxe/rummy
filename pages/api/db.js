@@ -7,10 +7,11 @@ export default async (req, res) => {
     if (action == "get_history") {
         const { data } = await faunaClient.query(
             q.Map(
-                q.Paginate(q.Documents(q.Collection("rummy_results"))),
-                q.Lambda((show) => q.Get(show))
+                q.Paginate(q.Match(q.Index("games_sort_by_date_desc"), true)),
+                q.Lambda(["date", "ref"], q.Get(q.Var("ref")))
             )
         );
+
         return res.status(200).json(data);
     }
     if (action == "save") {
