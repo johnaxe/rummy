@@ -151,7 +151,7 @@ const ScoreSummary = ({
             {sums[col.name]}
         </TableCell>
     ));
-    const gameDate = new Date(date);
+    const gameDate = new Date(date.replace(/-/g, "/"));
     return (
         playerNames.length > 0 && (
             <>
