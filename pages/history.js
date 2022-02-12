@@ -22,15 +22,15 @@ const History = () => {
         <Container>
             {documents &&
                 documents.map((d) => {
-                    const { data } = d;
+                    const { data, ts } = d;
                     return (
-                        <Box key={data.date} my={2}>
+                        <Box key={ts} my={1}>
                             <ScoreSummary
                                 scores={data.scores}
                                 ongoing={false}
                                 round={data.round}
                                 date={data.date}
-                                id={data.id}
+                                id={ts}
                                 finished={data.finished}
                                 visible={visible}
                                 setVisible={setVisible}

@@ -156,38 +156,46 @@ const ScoreSummary = ({
         playerNames.length > 0 && (
             <>
                 {round == 7 && (
-                    <Box
-                        pb={1}
-                        display="flex"
-                        flexDirection="row"
-                        sx={{
-                            cursor: finished ? "pointer" : "default",
-                        }}
-                        onClick={() => {
-                            finished && setVisible(id == visible ? 1 : id);
-                        }}>
-                        <Typography
-                            variant="h6"
+                    <Paper elevation={2}>
+                        <Box
+                            p={1}
+                            display="flex"
+                            flexDirection="row"
                             sx={{
-                                alignItems: "center",
-                                display: "flex",
+                                cursor: finished ? "pointer" : "default",
+                                background: "#fff",
+                            }}
+                            onClick={() => {
+                                finished && setVisible(id == visible ? 1 : id);
                             }}>
-                            <EmojiEventsIcon sx={{ color: "gold" }} />{" "}
-                            {winner.name}
-                        </Typography>
-                        {finished && date && (
-                            <Box sx={{ marginLeft: "auto" }}>
-                                <Chip
-                                    label={new Date(
-                                        date.replace(/-/g, "/")
-                                    ).toLocaleDateString("sv-SE")}
-                                />
-                            </Box>
-                        )}
-                    </Box>
+                            <Typography
+                                variant="h6"
+                                sx={{
+                                    alignItems: "center",
+                                    display: "flex",
+                                }}>
+                                <EmojiEventsIcon sx={{ color: "gold" }} />{" "}
+                                {winner.name}
+                            </Typography>
+                            {finished && date && (
+                                <Box sx={{ marginLeft: "auto" }}>
+                                    <Chip
+                                        label={new Date(
+                                            date.replace(/-/g, "/")
+                                        ).toLocaleDateString("sv-SE")}
+                                    />
+                                </Box>
+                            )}
+                        </Box>
+                    </Paper>
                 )}
                 <Collapse in={id == visible}>
-                    <TableContainer component={Paper}>
+                    <TableContainer
+                        component={Paper}
+                        sx={{
+                            borderTopLeftRadius: "0px",
+                            borderTopRightRadius: "0px",
+                        }}>
                         <Table size="small" aria-label="scoreboard">
                             <TableHead>
                                 <TableRow

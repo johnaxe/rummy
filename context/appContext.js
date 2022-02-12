@@ -36,6 +36,20 @@ const AppProvider = ({ children }) => {
         setShowSaved(showMsg);
     };
 
+    const deleteGame = async () => {
+        await axios.post("/api/db", {
+            action: "delete",
+            currentGame: currentGame,
+        });
+
+        setCurrentGame({
+            id: null,
+            round: 0,
+            date: null,
+            scores: {},
+        });
+    };
+
     const finishGame = async (showMsg = true) => {
         const thisGame = currentGame;
         thisGame["finished"] = true;
@@ -118,6 +132,7 @@ const AppProvider = ({ children }) => {
         showConfirm,
         setShowConfirm,
         useTemplate,
+        deleteGame,
     };
 
     return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

@@ -33,6 +33,11 @@ export default async (req, res) => {
         );
         return res.status(200).json(data);
     }
-
+    if (action == "delete") {
+        const { data } = await faunaClient.query(
+            q.Delete(q.Ref(q.Collection("rummy_results"), currentGame.id))
+        );
+        return res.status(200).json(data);
+    }
     return res.status(503).json("not available");
 };

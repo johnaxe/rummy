@@ -1,7 +1,12 @@
 import { createTheme } from "@mui/material/styles";
-
+import { blue } from "@mui/material/colors";
 const theme = createTheme({
     spacing: 8,
+    palette: {
+        background: {
+            default: blue[50],
+        },
+    },
     typography: {
         body1: {
             fontSize: ".9rem",
