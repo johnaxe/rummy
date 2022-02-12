@@ -19,7 +19,7 @@ const History = () => {
     }, []);
 
     return (
-        <Container>
+        <Container sx={{ pt: 1 }}>
             {documents &&
                 documents.map((d) => {
                     const { data, ts } = d;

@@ -14,6 +14,7 @@ const AppProvider = ({ children }) => {
     const [showNew, setShowNew] = useState(false);
     const [showSaved, setShowSaved] = useState(false);
     const [showConfirm, setShowConfirm] = useState(false);
+    const [showSpinner, setShowSpinner] = useState(false);
 
     useEffect(() => {
         const cookies = parseCookies();
@@ -133,6 +134,8 @@ const AppProvider = ({ children }) => {
         setShowConfirm,
         useTemplate,
         deleteGame,
+        showSpinner,
+        setShowSpinner,
     };
 
     return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

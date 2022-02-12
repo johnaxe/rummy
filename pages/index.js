@@ -214,8 +214,10 @@ const Home = () => {
                 <Box
                     sx={{
                         borderRadius: "4px",
+                        width: 256,
+                        height: 256,
                     }}>
-                    <Image width={256} height={256} src="/icon-512x512.png" />
+                    <Image width={512} height={512} src="/icon-512x512.png" />
                 </Box>
             </Paper>
         </Box>
