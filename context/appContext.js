@@ -37,6 +37,20 @@ const AppProvider = ({ children }) => {
         setShowSaved(showMsg);
     };
 
+    const loadGame = async (id) => {
+        const { data } = await axios.post("/api/db", {
+            action: "load",
+            ts: id,
+        });
+        setCurrentGame({
+            id: id,
+            round: data.round,
+            date: data.date,
+            scores: data.scores,
+        });
+        setShowNew(false);
+    };
+
     const deleteGame = async () => {
         await axios.post("/api/db", {
             action: "delete",
@@ -75,6 +89,7 @@ const AppProvider = ({ children }) => {
                 "sv-SE"
             )}`,
             scores: {},
+            finished: false,
         });
         setShowNew(true);
     };
@@ -136,6 +151,7 @@ const AppProvider = ({ children }) => {
         deleteGame,
         showSpinner,
         setShowSpinner,
+        loadGame,
     };
 
     return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

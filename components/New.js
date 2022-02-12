@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import {
     Box,
     Button,
@@ -15,8 +15,13 @@ import {
     Paper,
     InputAdornment,
     Alert,
-    Typography,
+    Select,
+    FormControl,
+    InputLabel,
+    MenuItem,
 } from "@mui/material";
+import axios from "axios";
+
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import { AppContext } from "context/appContext";
@@ -26,13 +31,40 @@ export default function FormDialog() {
     const [name, setName] = useState("");
     const [hasErrors, setHasErrors] = useState({ error: false, errorText: "" });
 
+    const [documents, setDocuments] = useState([]);
+
     const {
         showNew,
         setShowNew,
         currentGame,
         setCurrentGame,
         useTemplate,
+        loadGame,
     } = useContext(AppContext);
+
+    const handlePrevious = (event) => {
+        loadGame(event.target.value);
+    };
+
+    useEffect(() => {
+        const loadGames = async () => {
+            const { data } = await axios.post("/api/db", {
+                action: "get_unfinished",
+            });
+            setDocuments(data);
+        };
+        loadGames();
+    }, [showNew]);
+
+    const menuItems = documents
+        ? documents.map((d) => {
+              return (
+                  <MenuItem key={d.id} value={d.id}>
+                      {d.data.date} (spelomgång: {d.data.round + 1})
+                  </MenuItem>
+              );
+          })
+        : null;
 
     const { scores } = currentGame;
 
@@ -168,6 +200,24 @@ export default function FormDialog() {
         <Dialog open={showNew} onClose={handleClose}>
             <DialogTitle>{title}</DialogTitle>
             <DialogContent>
+                {documents.length > 0 && (
+                    <Paper elevation={1} sx={{ p: 2, my: 1 }}>
+                        <FormControl fullWidth>
+                            <InputLabel id="previous-games">
+                                Påbörjade spel
+                            </InputLabel>
+                            <Select
+                                labelId="previous-games"
+                                id="started-games"
+                                value=""
+                                label="Välj spelomgång"
+                                variant="filled"
+                                onChange={handlePrevious}>
+                                {menuItems}
+                            </Select>
+                        </FormControl>
+                    </Paper>
+                )}
                 {Object.keys(scores).length === 0 && template}
                 Skriv spelarens namn och klicka på <strong>Lägg till</strong>
                 {participants}

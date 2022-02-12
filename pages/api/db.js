@@ -3,7 +3,7 @@ const faunaClient = new faunadb.Client({
     secret: process.env.FAUNA_SECRET,
 });
 export default async (req, res) => {
-    const { action, currentGame } = req.body;
+    const { action, currentGame, ts } = req.body;
     if (action == "get_history") {
         const { data } = await faunaClient.query(
             q.Map(
@@ -13,6 +13,20 @@ export default async (req, res) => {
         );
 
         return res.status(200).json(data);
+    }
+    if (action == "get_unfinished") {
+        const { data } = await faunaClient.query(
+            q.Map(
+                q.Paginate(q.Match(q.Index("games_sort_by_date_desc"), false)),
+                q.Lambda(["date", "ref"], q.Get(q.Var("ref")))
+            )
+        );
+
+        const results = data.map((d) => {
+            return { id: d.ref.id, data: d.data };
+        });
+
+        return res.status(200).json(results);
     }
     if (action == "save") {
         const {
@@ -25,11 +39,18 @@ export default async (req, res) => {
         );
         return res.status(200).json({ data: data, id: id });
     }
+
     if (action == "update") {
         const { data } = await faunaClient.query(
             q.Update(q.Ref(q.Collection("rummy_results"), currentGame.id), {
                 data: currentGame,
             })
+        );
+        return res.status(200).json(data);
+    }
+    if (action == "load") {
+        const { data } = await faunaClient.query(
+            q.Get(q.Ref(q.Collection("rummy_results"), ts))
         );
         return res.status(200).json(data);
     }
