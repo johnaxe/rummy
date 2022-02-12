@@ -17,7 +17,6 @@ export default function Layout({ children }) {
                     content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
                 />
                 <title>Rummy</title>
-                <link rel="icon" href="/favicon.ico" />
             </Head>
             <Box sx={{ flexGrow: 1 }}>
                 <AppBar position="static">
