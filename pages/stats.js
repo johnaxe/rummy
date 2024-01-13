@@ -34,7 +34,8 @@ const Stats = () => {
             });
             setDocuments(data);
             const grouped = {};
-            data.forEach((d) => {
+            let firstKey;
+            data.forEach((d, i) => {
                 const playerNames = Object.entries(d.data.scores)
                     .map(([k, v]) => {
                         return k;
@@ -52,8 +53,13 @@ const Stats = () => {
                     grouped[gameKey] = { names: firstNames, games: [] };
                 }
                 grouped[gameKey].games.push(d);
+                if (i == 0) {
+                    firstKey = gameKey;
+                }
             });
             setGroups(grouped);
+            setSelected(firstKey);
+            setDocuments(grouped[firstKey].games);
         };
         getAll();
     }, []);
@@ -92,17 +98,23 @@ const Stats = () => {
         return <></>;
     }
 
-    const { games, rounds } = summarize(documents);
+    const { games, rounds, lastrounds, lowHigh } = summarize(documents);
+    console.log(lowHigh);
     const sortedGames = [],
-        sortedRounds = [];
+        sortedRounds = [],
+        sortedLastrounds = [];
     Object.entries(games).map(([player, score]) => {
         sortedGames.push({ name: player, score: score });
     });
     Object.entries(rounds).map(([player, score]) => {
         sortedRounds.push({ name: player, score: score });
     });
+    Object.entries(lastrounds).map(([player, score]) => {
+        sortedLastrounds.push({ name: player, score: score });
+    });
     sortedGames.sort((a, b) => (a.score < b.score ? 1 : -1));
     sortedRounds.sort((a, b) => (a.score < b.score ? 1 : -1));
+    sortedLastrounds.sort((a, b) => (a.score < b.score ? 1 : -1));
 
     const gamedata = {
         labels: Object.keys(games),
@@ -241,6 +253,111 @@ const Stats = () => {
                                                 </TableCell>
                                             </TableRow>
                                         ))}
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
+                        </Box>
+                    </Paper>
+                    <Paper elevation={2} sx={{ my: 4 }}>
+                        <Box
+                            display="flex"
+                            flexDirection="column"
+                            justifyContent="center"
+                            mt={2}>
+                            <Typography variant="h6" textAlign="center">
+                                Vinnare sista spelomgång (3 stegar)
+                            </Typography>
+                            <TableContainer component={Paper}>
+                                <Table size="small">
+                                    <TableBody>
+                                        {sortedLastrounds.map((player) => (
+                                            <TableRow
+                                                key={player.name}
+                                                sx={{
+                                                    "&:last-child td, &:last-child th": {
+                                                        border: 0,
+                                                    },
+                                                }}>
+                                                <TableCell
+                                                    component="td"
+                                                    scope="row">
+                                                    {player.name}
+                                                </TableCell>
+                                                <TableCell
+                                                    component="td"
+                                                    scope="row">
+                                                    {player.score}
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
+                        </Box>
+                    </Paper>
+                    <Paper elevation={2} sx={{ my: 4 }}>
+                        <Box
+                            display="flex"
+                            flexDirection="column"
+                            justifyContent="center"
+                            mt={2}>
+                            <Typography variant="h6" textAlign="center">
+                                Lägst slutpoäng
+                            </Typography>
+                            <TableContainer component={Paper}>
+                                <Table size="small">
+                                    <TableBody>
+                                        <TableRow
+                                            sx={{
+                                                "&:last-child td, &:last-child th": {
+                                                    border: 0,
+                                                },
+                                            }}>
+                                            <TableCell
+                                                component="td"
+                                                scope="row">
+                                                {lowHigh.low.name}
+                                            </TableCell>
+                                            <TableCell
+                                                component="td"
+                                                scope="row">
+                                                {lowHigh.low.value}
+                                            </TableCell>
+                                        </TableRow>
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
+                        </Box>
+                    </Paper>
+                    <Paper elevation={2} sx={{ my: 4 }}>
+                        <Box
+                            display="flex"
+                            flexDirection="column"
+                            justifyContent="center"
+                            mt={2}>
+                            <Typography variant="h6" textAlign="center">
+                                Högst slutpoäng
+                            </Typography>
+                            <TableContainer component={Paper}>
+                                <Table size="small">
+                                    <TableBody>
+                                        <TableRow
+                                            sx={{
+                                                "&:last-child td, &:last-child th": {
+                                                    border: 0,
+                                                },
+                                            }}>
+                                            <TableCell
+                                                component="td"
+                                                scope="row">
+                                                {lowHigh.high.name}
+                                            </TableCell>
+                                            <TableCell
+                                                component="td"
+                                                scope="row">
+                                                {lowHigh.high.value}
+                                            </TableCell>
+                                        </TableRow>
                                     </TableBody>
                                 </Table>
                             </TableContainer>
