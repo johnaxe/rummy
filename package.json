@@ -13,7 +13,6 @@
         "@mui/icons-material": "^5.0.0",
         "@mui/material": "^5.0.0",
         "@mui/styles": "^5.0.0-rc.1",
-        "@next/swc-darwin-arm64": "^14.0.4",
         "axios": "^0.21.1",
         "chart.js": "^3.7.0",
         "faunadb": "^4.5.0",
