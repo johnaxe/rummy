@@ -19,26 +19,26 @@ import {
     FormControl,
     InputLabel,
     MenuItem,
+    Typography,
+    Chip,
 } from "@mui/material";
 import axios from "axios";
-
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import { AppContext } from "context/appContext";
-import { playerTemplate } from "lib/config";
 
 export default function FormDialog() {
     const [name, setName] = useState("");
     const [hasErrors, setHasErrors] = useState({ error: false, errorText: "" });
 
     const [documents, setDocuments] = useState([]);
+    const [players, setPlayers] = useState([]);
 
     const {
         showNew,
         setShowNew,
         currentGame,
         setCurrentGame,
-        useTemplate,
         loadGame,
     } = useContext(AppContext);
 
@@ -53,14 +53,35 @@ export default function FormDialog() {
             });
             setDocuments(data);
         };
+        const loadPlayers = async () => {
+            const {
+                data: { players },
+            } = await axios.post("/api/db", {
+                action: "get_players",
+            });
+            setPlayers(players);
+        };
+        loadPlayers();
         loadGames();
     }, [showNew]);
 
     const menuItems = documents
         ? documents.map((d) => {
+              const playerNames = Object.entries(d.data.scores).map(
+                  ([k, v]) => {
+                      const words = k.trim().split(" ");
+                      return words[0];
+                  }
+              );
               return (
-                  <MenuItem key={d.id} value={d.id}>
-                      {d.data.date} (spelomgång: {d.data.round + 1})
+                  <MenuItem
+                      key={d.id}
+                      value={d.id}
+                      sx={{ display: "flex", flexDirection: "column" }}>
+                      <Typography sx={{ fontSize: 10 }}>
+                          {d.data.date} (spelomgång: {d.data.round + 1})
+                      </Typography>
+                      <Typography>{playerNames.join(", ")}</Typography>
                   </MenuItem>
               );
           })
@@ -78,41 +99,24 @@ export default function FormDialog() {
     };
 
     const template = (
-        <Alert
-            icon={false}
-            severity="info"
-            sx={{ justifyContent: "center", mb: 2 }}>
-            <Button
-                sx={{ mb: 2 }}
-                variant="contained"
-                onClick={() => {
-                    useTemplate(playerTemplate);
-                }}>
-                Använd mall
-            </Button>
-            <TableContainer component={Paper}>
-                <Table
-                    sx={{ minWidth: 240 }}
-                    size="small"
-                    aria-label="template">
-                    <TableBody>
-                        {playerTemplate.map((player) => (
-                            <TableRow
-                                key={player}
-                                sx={{
-                                    "&:last-child td, &:last-child th": {
-                                        border: 0,
-                                    },
-                                }}>
-                                <TableCell component="td" scope="row">
-                                    {player}
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </TableContainer>
-        </Alert>
+        <Box sx={{ mb: 2, display: "flex", flexWrap: "wrap", gap: 2 }}>
+            {players.map((player) => {
+                const playerNames = Object.entries(scores).map(([k, v]) => {
+                    return k;
+                });
+                return (
+                    !playerNames.includes(player) && (
+                        <Chip
+                            label={player}
+                            key={player}
+                            onClick={() => {
+                                autoAddPlayer(player);
+                            }}
+                        />
+                    )
+                );
+            })}
+        </Box>
     );
 
     const addPlayer = () => {
@@ -135,6 +139,30 @@ export default function FormDialog() {
 
         let newScores = { ...currentGame.scores };
         newScores[name] = { score: Array(7).fill("") };
+        setCurrentGame({ ...currentGame, scores: newScores });
+        setName("");
+    };
+
+    const autoAddPlayer = (playerName) => {
+        setHasErrors({ error: false, errorText: "" });
+        if (playerName == "") {
+            setHasErrors({ error: true, errorText: "Namn kan inte vara tomt" });
+            return;
+        }
+        const playerNames = Object.entries(scores).map(([k, v]) => {
+            return k;
+        });
+
+        if (playerNames.includes(playerName)) {
+            setHasErrors({
+                error: true,
+                errorText: "Det finns redan en spelare med samma namn.",
+            });
+            return;
+        }
+
+        let newScores = { ...currentGame.scores };
+        newScores[playerName] = { score: Array(7).fill("") };
         setCurrentGame({ ...currentGame, scores: newScores });
         setName("");
     };
@@ -218,7 +246,7 @@ export default function FormDialog() {
                         </FormControl>
                     </Paper>
                 )}
-                {Object.keys(scores).length === 0 && template}
+                {template}
                 Skriv spelarens namn och klicka på <strong>Lägg till</strong>
                 {participants}
                 <TextField

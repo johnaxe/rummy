@@ -11,6 +11,10 @@ import {
     TableContainer,
     TableRow,
     Paper,
+    MenuItem,
+    FormControl,
+    InputLabel,
+    Select,
 } from "@mui/material";
 import axios from "axios";
 import { useState, useEffect } from "react";
@@ -20,15 +24,69 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 
 const Stats = () => {
     const [documents, setDocuments] = useState([]);
+    const [groups, setGroups] = useState({});
+    const [menuItems, setMenuItems] = useState(null);
+    const [selected, setSelected] = useState("");
     useEffect(() => {
         const getAll = async () => {
             const { data } = await axios.post("/api/db", {
                 action: "get_history",
             });
             setDocuments(data);
+            const grouped = {};
+            data.forEach((d) => {
+                const playerNames = Object.entries(d.data.scores)
+                    .map(([k, v]) => {
+                        return k;
+                    })
+                    .sort();
+                const gameKey = playerNames.join("-");
+                const firstNamesSorted = Object.entries(d.data.scores)
+                    .map(([k, v]) => {
+                        const words = k.trim().split(" ");
+                        return words[0];
+                    })
+                    .sort();
+                const firstNames = firstNamesSorted.join(", ");
+                if (!grouped.hasOwnProperty(gameKey)) {
+                    grouped[gameKey] = { names: firstNames, games: [] };
+                }
+                grouped[gameKey].games.push(d);
+            });
+            setGroups(grouped);
         };
         getAll();
     }, []);
+
+    useEffect(() => {
+        setMenuItems(
+            Object.entries(groups).map(([key, value]) => {
+                return (
+                    <MenuItem
+                        key={key}
+                        value={key}
+                        sx={{
+                            display: "flex",
+                            flexDirection: "row",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                        }}>
+                        <Typography sx={{ fontSize: 12 }}>
+                            {value.names}
+                        </Typography>
+                        <Typography sx={{ fontSize: 12 }}>
+                            {value.games.length} spel
+                        </Typography>
+                    </MenuItem>
+                );
+            })
+        );
+    }, [groups]);
+
+    const handleGroup = (event) => {
+        setSelected(event.target.value);
+        setDocuments(groups[event.target.value].games);
+    };
 
     if (!documents) {
         return <></>;
@@ -94,6 +152,22 @@ const Stats = () => {
     };
     return (
         <Container>
+            {menuItems && (
+                <Paper elevation={1} sx={{ p: 2, my: 1 }}>
+                    <FormControl fullWidth>
+                        <InputLabel id="groups">Välj konstellation</InputLabel>
+                        <Select
+                            labelId="groups"
+                            id="groups"
+                            value={selected}
+                            label="Välj konstellation"
+                            variant="outlined"
+                            onChange={handleGroup}>
+                            {menuItems}
+                        </Select>
+                    </FormControl>
+                </Paper>
+            )}
             <Grid container spacing={2}>
                 <Grid item xs={12} sm={6}>
                     <Paper elevation={2} sx={{ my: 2 }}>

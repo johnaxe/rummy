@@ -21,7 +21,7 @@ import Layout from "@/components/Layout";
 import { AppContext } from "context/appContext";
 import ScoreSummary from "@/components/ScoreSummary";
 import Confetti from "react-confetti";
-
+import PlayMe from "@/components/PlayMe";
 const Home = () => {
     const [scoreError, setScoreError] = useState({ error: false, type: 1 });
     const [mounted, setMounted] = useState(false);
@@ -203,6 +203,7 @@ const Home = () => {
                 )}
             </Box>
             {round == 7 && <Confetti recycle={false} />}
+            {round == 7 && <PlayMe />}
         </Container>
     ) : (
         <Box

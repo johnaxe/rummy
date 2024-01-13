@@ -28,6 +28,25 @@ export default async (req, res) => {
 
         return res.status(200).json(results);
     }
+    if (action == "get_players") {
+        const { data } = await faunaClient.query(
+            q.Map(
+                q.Paginate(q.Match(q.Index("games_sort_by_date_desc"), true)),
+                q.Lambda(["date", "ref"], q.Get(q.Var("ref")))
+            )
+        );
+        const players = [];
+        data.forEach((game) => {
+            const objKeys = Object.keys(game.data.scores);
+            objKeys.forEach((k) => {
+                if (!players.includes(k)) {
+                    players.push(k);
+                }
+            });
+        });
+
+        return res.status(200).json({ players: players });
+    }
     if (action == "save") {
         const {
             data,
