@@ -13,7 +13,7 @@ const History = () => {
                 action: "get_history",
             });
             setDocuments(data);
-            setVisible(data[0].data.id);
+            setVisible(data[0]?.id);
         };
         getAll();
     }, []);
@@ -21,17 +21,16 @@ const History = () => {
     return (
         <Container sx={{ pt: 1 }}>
             {documents &&
-                documents.map((d) => {
-                    const { data, ts } = d;
+                documents.map(({ scores, id, round, date, finished }) => {
                     return (
-                        <Box key={ts} my={1}>
+                        <Box key={id} my={1}>
                             <ScoreSummary
-                                scores={data.scores}
+                                scores={scores}
                                 ongoing={false}
-                                round={data.round}
-                                date={data.date}
-                                id={ts}
-                                finished={data.finished}
+                                round={round}
+                                date={date}
+                                id={id}
+                                finished={finished}
                                 visible={visible}
                                 setVisible={setVisible}
                             />

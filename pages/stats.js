@@ -33,16 +33,17 @@ const Stats = () => {
                 action: "get_history",
             });
             setDocuments(data);
+
             const grouped = {};
             let firstKey;
             data.forEach((d, i) => {
-                const playerNames = Object.entries(d.data.scores)
+                const playerNames = Object.entries(d.scores)
                     .map(([k, v]) => {
                         return k;
                     })
                     .sort();
                 const gameKey = playerNames.join("-");
-                const firstNamesSorted = Object.entries(d.data.scores)
+                const firstNamesSorted = Object.entries(d.scores)
                     .map(([k, v]) => {
                         const words = k.trim().split(" ");
                         return words[0];
@@ -57,9 +58,10 @@ const Stats = () => {
                     firstKey = gameKey;
                 }
             });
+            console.log("stats grouped:", grouped);
             setGroups(grouped);
             setSelected(firstKey);
-            setDocuments(grouped[firstKey].games);
+            setDocuments(grouped[firstKey] ? grouped[firstKey].games : []);
         };
         getAll();
     }, []);

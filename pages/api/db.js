@@ -1,85 +1,86 @@
-import faunadb, { query as q } from "faunadb";
-const faunaClient = new faunadb.Client({
-    secret: process.env.FAUNA_SECRET,
-});
+import prisma from "lib/prisma"; // or "../../lib/prisma" if not using aliases
+
 export default async (req, res) => {
     const { action, currentGame, ts } = req.body;
-    if (action == "get_history") {
-        const { data } = await faunaClient.query(
-            q.Map(
-                q.Paginate(q.Match(q.Index("games_sort_by_date_desc"), true), {
-                    size: 1000, // Max size, since you have fewer than 1000 collections
-                }),
-                q.Lambda(["date", "ref"], q.Get(q.Var("ref")))
-            )
-        );
 
-        return res.status(200).json(data);
-    }
-    if (action == "get_unfinished") {
-        const { data } = await faunaClient.query(
-            q.Map(
-                q.Paginate(q.Match(q.Index("games_sort_by_date_desc"), false)),
-                q.Lambda(["date", "ref"], q.Get(q.Var("ref")))
-            )
-        );
-
-        const results = data.map((d) => {
-            return { id: d.ref.id, data: d.data };
-        });
-
-        return res.status(200).json(results);
-    }
-    if (action == "get_players") {
-        const { data } = await faunaClient.query(
-            q.Map(
-                q.Paginate(q.Match(q.Index("games_sort_by_date_desc"), true)),
-                q.Lambda(["date", "ref"], q.Get(q.Var("ref")))
-            )
-        );
-        const players = [];
-        data.forEach((game) => {
-            const objKeys = Object.keys(game.data.scores);
-            objKeys.forEach((k) => {
-                if (!players.includes(k)) {
-                    players.push(k);
-                }
+    try {
+        if (action === "get_history") {
+            const results = await prisma.rummyResult.findMany({
+                where: { finished: true },
+                orderBy: {
+                    date: "desc",
+                },
+                take: 1000,
             });
-        });
 
-        return res.status(200).json({ players: players });
-    }
-    if (action == "save") {
-        const {
-            data,
-            ref: { id },
-        } = await faunaClient.query(
-            q.Create(q.Collection("rummy_results"), {
-                data: currentGame,
-            })
-        );
-        return res.status(200).json({ data: data, id: id });
-    }
+            return res.status(200).json(results);
+        }
 
-    if (action == "update") {
-        const { data } = await faunaClient.query(
-            q.Update(q.Ref(q.Collection("rummy_results"), currentGame.id), {
+        if (action === "get_unfinished") {
+            const results = await prisma.rummyResult.findMany({
+                where: { finished: false },
+                orderBy: {
+                    date: "desc",
+                },
+            });
+
+            return res.status(200).json(results);
+        }
+
+        if (action === "get_players") {
+            const results = await prisma.rummyResult.findMany({
+                where: { finished: true },
+                orderBy: {
+                    date: "desc",
+                },
+            });
+
+            const players = new Set();
+            results.forEach((game) => {
+                const scores = game.scores || {};
+                Object.keys(scores).forEach((player) => players.add(player));
+            });
+
+            return res.status(200).json({ players: [...players] });
+        }
+
+        if (action === "save") {
+            delete currentGame.id;
+            const result = await prisma.rummyResult.create({
                 data: currentGame,
-            })
-        );
-        return res.status(200).json(data);
+            });
+
+            return res.status(200).json({ data: result.data, id: result.id });
+        }
+
+        if (action === "update") {
+            const result = await prisma.rummyResult.update({
+                where: { id: currentGame.id },
+                data: currentGame,
+            });
+
+            return res.status(200).json(result);
+        }
+
+        if (action === "load") {
+            const result = await prisma.rummyResult.findUnique({
+                where: { id: ts },
+            });
+
+            return res.status(200).json(result);
+        }
+
+        if (action === "delete") {
+            const result = await prisma.rummyResult.delete({
+                where: { id: currentGame.id },
+            });
+
+            return res.status(200).json(result);
+        }
+
+        return res.status(503).json("Not available");
+    } catch (error) {
+        console.error("DB Error:", error);
+        return res.status(500).json({ error: "Something went wrong." });
     }
-    if (action == "load") {
-        const { data } = await faunaClient.query(
-            q.Get(q.Ref(q.Collection("rummy_results"), ts))
-        );
-        return res.status(200).json(data);
-    }
-    if (action == "delete") {
-        const { data } = await faunaClient.query(
-            q.Delete(q.Ref(q.Collection("rummy_results"), currentGame.id))
-        );
-        return res.status(200).json(data);
-    }
-    return res.status(503).json("not available");
 };

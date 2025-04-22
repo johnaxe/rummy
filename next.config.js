@@ -1,5 +1,8 @@
 const path = require("path");
 const withPWA = require("next-pwa");
+
+const isProd = process.env.NODE_ENV === "production";
+
 module.exports = withPWA({
     i18n: {
         locales: ["sv"],
@@ -14,5 +17,6 @@ module.exports = withPWA({
         dest: "public",
         register: true,
         skipWaiting: true,
+        disable: !isProd, // ✅ this disables PWA in dev
     },
 });

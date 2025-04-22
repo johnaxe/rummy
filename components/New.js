@@ -64,28 +64,27 @@ export default function FormDialog() {
         loadPlayers();
         loadGames();
     }, [showNew]);
-
-    const menuItems = documents
-        ? documents.map((d) => {
-              const playerNames = Object.entries(d.data.scores).map(
-                  ([k, v]) => {
+    console.log("documents:", documents);
+    const menuItems =
+        documents.length > 0
+            ? documents.map((d) => {
+                  const playerNames = Object.entries(d.scores).map(([k, v]) => {
                       const words = k.trim().split(" ");
                       return words[0];
-                  }
-              );
-              return (
-                  <MenuItem
-                      key={d.id}
-                      value={d.id}
-                      sx={{ display: "flex", flexDirection: "column" }}>
-                      <Typography sx={{ fontSize: 10 }}>
-                          {d.data.date} (spelomgång: {d.data.round + 1})
-                      </Typography>
-                      <Typography>{playerNames.join(", ")}</Typography>
-                  </MenuItem>
-              );
-          })
-        : null;
+                  });
+                  return (
+                      <MenuItem
+                          key={d.id}
+                          value={d.id}
+                          sx={{ display: "flex", flexDirection: "column" }}>
+                          <Typography sx={{ fontSize: 10 }}>
+                              {d.date} (spelomgång: {d.round + 1})
+                          </Typography>
+                          <Typography>{playerNames.join(", ")}</Typography>
+                      </MenuItem>
+                  );
+              })
+            : null;
 
     const { scores } = currentGame;
 

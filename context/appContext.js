@@ -123,6 +123,8 @@ const AppProvider = ({ children }) => {
         setShowNew(true);
     };
 
+    console.log("currentGame:", currentGame);
+
     const useTemplate = (players) => {
         let newScores = { ...currentGame.scores };
         players.map((player) => {

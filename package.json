@@ -4,7 +4,9 @@
     "private": true,
     "scripts": {
         "dev": "node server.js",
+        "prisma:generate": "prisma generate",
         "build": "next build",
+        "vercel-build": "npm run prisma:generate && next build",
         "start": "next start"
     },
     "dependencies": {
@@ -13,8 +15,11 @@
         "@mui/icons-material": "^5.0.0",
         "@mui/material": "^5.0.0",
         "@mui/styles": "^5.0.0-rc.1",
+        "@prisma/client": "^6.6.0",
         "axios": "^0.21.1",
         "chart.js": "^3.7.0",
+        "csv-writer": "^1.6.0",
+        "dotenv": "^16.5.0",
         "faunadb": "^4.5.0",
         "next": "^12.0.7",
         "next-pwa": "^5.4.4",
@@ -25,5 +30,8 @@
         "react-confetti": "^6.0.1",
         "react-dom": "^17.0.2",
         "sass": "^1.32.5"
+    },
+    "devDependencies": {
+        "prisma": "^6.6.0"
     }
 }

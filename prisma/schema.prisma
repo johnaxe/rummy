@@ -1,0 +1,18 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model RummyResult {
+  id        String   @id @default(cuid())
+  finished  Boolean
+  scores      Json     // This field can store any JSON structure
+  createdAt DateTime @default(now())
+  date String
+  round Int
+  @@index([finished])
+}
