@@ -1,3 +1,9 @@
 {
-    "buildCommand": "npm run vercel-build"
+    "buildCommand": "npm run vercel-build",
+    "functions": {
+        "api/ping.js": {
+            "runtime": "nodejs18.x",
+            "schedule": "0 8 * * *"
+        }
+    }
 }
